@@ -1,0 +1,14 @@
+{
+  "name": "filebrowser",
+  "label": "Filebrowser",
+  "description": "Read-only file browser for a configured document root",
+  "icon": "FolderOpen",
+  "version": "0.1.0",
+  "tab": {
+    "path": "/filebrowser",
+    "position": "after:skills"
+  },
+  "entry": "dist/index.js",
+  "css": "dist/style.css",
+  "api": "plugin_api.py"
+}

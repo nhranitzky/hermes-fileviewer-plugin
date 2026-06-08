@@ -1,0 +1,3 @@
+name: filebrowser
+version: "0.1.0"
+description: Read-only Hermes dashboard filebrowser for a configured document root
