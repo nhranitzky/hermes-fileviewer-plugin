@@ -118,6 +118,46 @@
     return out;
   }
 
+  function splitTableRow(line) {
+    let s = String(line || "").trim();
+    if (!s.includes("|")) return null;
+    if (s.startsWith("|")) s = s.slice(1);
+    if (s.endsWith("|")) s = s.slice(0, -1);
+    return s.split("|").map(function (cell) { return cell.trim(); });
+  }
+
+  function parseTableSeparator(line, expectedColumns) {
+    const cells = splitTableRow(line);
+    if (!cells || cells.length !== expectedColumns) return null;
+    const aligns = [];
+    for (let i = 0; i < cells.length; i += 1) {
+      const cell = cells[i];
+      if (!/^:?-{3,}:?$/.test(cell)) return null;
+      const left = cell.startsWith(":");
+      const right = cell.endsWith(":");
+      aligns.push(left && right ? "center" : right ? "right" : left ? "left" : null);
+    }
+    return aligns;
+  }
+
+  function renderMarkdownTable(header, rows, aligns, key) {
+    return h("div", { key: key, className: "fb-table-wrap" },
+      h("table", { className: "fb-markdown-table" },
+        h("thead", null,
+          h("tr", null, header.map(function (cell, i) {
+            return h("th", { key: i, style: aligns[i] ? { textAlign: aligns[i] } : null }, inlineMarkdown(cell, key + "h" + i));
+          }))
+        ),
+        h("tbody", null, rows.map(function (row, ri) {
+          return h("tr", { key: ri }, header.map(function (_cell, ci) {
+            const value = row[ci] || "";
+            return h("td", { key: ci, style: aligns[ci] ? { textAlign: aligns[ci] } : null }, inlineMarkdown(value, key + "r" + ri + "c" + ci));
+          }));
+        }))
+      )
+    );
+  }
+
   // Minimal safe Markdown renderer. It never injects raw HTML; all user text is
   // emitted as React text nodes. That intentionally removes raw HTML from .md.
   function renderMarkdownSafe(markdown) {
@@ -148,20 +188,40 @@
       code = [];
     }
 
-    lines.forEach(function (line) {
+    for (let lineIndex = 0; lineIndex < lines.length; lineIndex += 1) {
+      const line = lines[lineIndex];
       if (/^```/.test(line.trim())) {
         if (inCode) { flushCode(); inCode = false; }
         else { flushParagraph(); flushList(); inCode = true; code = []; }
-        return;
+        continue;
       }
-      if (inCode) { code.push(line); return; }
-      if (!line.trim()) { flushParagraph(); flushList(); return; }
+      if (inCode) { code.push(line); continue; }
+      if (!line.trim()) { flushParagraph(); flushList(); continue; }
+
+      const maybeHeader = splitTableRow(line);
+      const maybeAligns = maybeHeader && lineIndex + 1 < lines.length ? parseTableSeparator(lines[lineIndex + 1], maybeHeader.length) : null;
+      if (maybeHeader && maybeAligns) {
+        flushParagraph();
+        flushList();
+        const tableRows = [];
+        lineIndex += 2;
+        while (lineIndex < lines.length) {
+          const row = splitTableRow(lines[lineIndex]);
+          if (!row || !lines[lineIndex].trim()) break;
+          tableRows.push(row);
+          lineIndex += 1;
+        }
+        lineIndex -= 1;
+        nodes.push(renderMarkdownTable(maybeHeader, tableRows, maybeAligns, "table" + nodes.length));
+        continue;
+      }
+
       const heading = line.match(/^(#{1,6})\s+(.+)$/);
       if (heading) {
         flushParagraph(); flushList();
         const level = Math.min(6, heading[1].length);
         nodes.push(h("h" + level, { key: "h" + nodes.length }, inlineMarkdown(heading[2], "h" + nodes.length)));
-        return;
+        continue;
       }
       const li = line.match(/^\s*[-*+]\s+(.+)$/);
       if (li) {
@@ -169,7 +229,7 @@
         if (list.length && listTag !== "ul") flushList();
         listTag = "ul";
         list.push(li[1]);
-        return;
+        continue;
       }
       const oli = line.match(/^\s*\d+[.)]\s+(.+)$/);
       if (oli) {
@@ -177,10 +237,10 @@
         if (list.length && listTag !== "ol") flushList();
         listTag = "ol";
         list.push(oli[1]);
-        return;
+        continue;
       }
       paragraph.push(line.trim());
-    });
+    }
     if (inCode) flushCode();
     flushParagraph();
     flushList();

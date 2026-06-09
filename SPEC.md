@@ -386,6 +386,7 @@ Preview behavior:
   - unordered lists render with visible bullet markers and indentation
   - ordered lists render with visible decimal markers and indentation
   - inline code uses scoped dashboard-token colors so it stays readable in dark theme
+  - GitHub-style pipe tables render as real HTML tables with scoped table styling
 - HTML:
   - displayed unchanged via `/raw-path/<relative-file>?mode=inline`
   - embedded only in sandboxed iframe with `allow-same-origin` so same-root relative images can load
@@ -513,6 +514,7 @@ Frontend smoke tests:
 - Markdown frontmatter is hidden by default and can be revealed.
 - Markdown lists show bullets/numbers and indentation despite dashboard CSS resets.
 - Markdown inline code is readable in dark theme and does not inherit unreadable global code colors.
+- Markdown pipe tables render as tables with scoped readable styling.
 - HTML preview opens in a sandboxed iframe.
 - HTML preview loads same-root relative image assets through `/raw-path`.
 - PDF preview opens inline.
@@ -535,7 +537,7 @@ Recommended order:
 9. Add backend security tests.
 10. Add minimal frontend tab.
 11. Add split-view navigation.
-12. Add Markdown preview with sanitization, frontmatter handling, list styling, and readable inline code.
+12. Add Markdown preview with sanitization, frontmatter handling, list styling, readable inline code, and pipe table rendering.
 13. Add HTML/PDF iframe previews using `/raw-path` for relative asset support.
 14. Add compact glyph controls for parent navigation, frontmatter reveal, and download.
 15. Add frontend static regression checks.

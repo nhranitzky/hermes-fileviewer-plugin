@@ -329,7 +329,8 @@
 .fb-markdown p,
 .fb-markdown ul,
 .fb-markdown ol,
-.fb-markdown pre {
+.fb-markdown pre,
+.fb-table-wrap {
   margin: 0.75rem 0;
 }
 
@@ -351,6 +352,34 @@
   display: list-item;
   margin: 0.25rem 0;
   padding-left: 0.15rem;
+}
+
+.fb-table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.fb-markdown-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.fb-markdown-table th,
+.fb-markdown-table td {
+  border: 1px solid var(--color-border);
+  padding: 0.45rem 0.6rem;
+  vertical-align: top;
+}
+
+.fb-markdown-table th {
+  background: color-mix(in srgb, var(--color-foreground) 8%, transparent);
+  color: var(--color-foreground);
+  font-weight: 700;
+}
+
+.fb-markdown-table tr:nth-child(even) td {
+  background: color-mix(in srgb, var(--color-foreground) 3%, transparent);
 }
 
 .fb-markdown code {

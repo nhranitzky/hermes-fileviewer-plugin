@@ -111,6 +111,21 @@ def test_markdown_inline_code_has_readable_scoped_colors():
     assert "border: 1px solid" in css
 
 
+def test_markdown_tables_are_rendered_and_styled():
+    js = JS.read_text(encoding="utf-8")
+    css = CSS.read_text(encoding="utf-8")
+    assert "function splitTableRow" in js
+    assert "function parseTableSeparator" in js
+    assert "function renderMarkdownTable" in js
+    assert "fb-markdown-table" in js
+    assert "h(\"thead\"" in js
+    assert "h(\"tbody\"" in js
+    assert ".fb-table-wrap" in css
+    assert ".fb-markdown-table" in css
+    assert "border-collapse: collapse" in css
+    assert ".fb-markdown-table th," in css
+
+
 def test_css_contains_split_view_and_mobile_layout():
     css = CSS.read_text(encoding="utf-8")
     assert ".fb-shell" in css

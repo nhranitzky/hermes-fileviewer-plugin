@@ -145,6 +145,7 @@ Supported:
 - Code blocks
 - Unordered lists
 - Ordered lists
+- Pipe tables
 - Frontmatter detection
 
 YAML frontmatter at the beginning of a Markdown file is hidden from the document body by default. It can be revealed with the `ⓘ` glyph. Simple `key: value` frontmatter is displayed as a compact metadata block.
@@ -240,5 +241,9 @@ node --check filebrowser/dashboard/dist/index.js
 Current verified state:
 
 ```text
-24 passed
+25 passed
 ```
+
+---
+
+Plugin developed in Hermes with GPT-5.5.
