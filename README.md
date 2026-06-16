@@ -29,7 +29,7 @@ These image files are not shown as standalone documents in the file list by defa
 Install directly from the repository distribution path:
 
 ```bash
-hermes plugins install https://github.com/nhranitzky/hermes-fileviewer-plugin/fileviewer
+hermes plugins install hermes plugins install nhranitzky/hermes-fileviewer-plugin/fileviewer/
 ```
 
 The plugin is installed into the active Hermes profile's plugin directory.
