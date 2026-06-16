@@ -26,50 +26,14 @@ These image files are not shown as standalone documents in the file list by defa
 
 ## Installation
 
-The plugin directory must be installed in the Hermes profile under `plugins/fileviewer`.
-
-Set the install target in `.env`:
+Install directly from the repository distribution path:
 
 ```bash
-PLUGIN_INSTALL_DIR=/opt/data/plugins/fileviewer
+hermes plugins install https://github.com/nhranitzky/hermes-fileviewer-plugin/fileviewer
 ```
 
-Install with:
+The plugin is installed into the active Hermes profile's plugin directory.
 
-```bash
-make install
-```
-
-The `install` target uses `rsync --delete` to copy only the runtime plugin directory `fileviewer/` into `PLUGIN_INSTALL_DIR`.
-
-For development, a symlink is also possible:
-
-```bash
-mkdir -p /opt/data/plugins
-ln -sfn /opt/data/workspace/hermes-fileviewer-plugin/fileviewer /opt/data/plugins/fileviewer
-```
-
-After changes to `dashboard/plugin_api.py` or the plugin configuration, restart the Hermes Dashboard. FastAPI routes from dashboard plugins are imported and mounted at dashboard startup.
-
-After frontend-only changes to `dashboard/dist/index.js` or `dashboard/dist/style.css`, a browser hard refresh is usually enough:
-
-```text
-Ctrl+Shift+R
-```
-
-If the dashboard does not see the plugin yet, a plugin rescan may help:
-
-```text
-/api/dashboard/plugins/rescan
-```
-
-With a dashboard prefix, for example `/hermes`:
-
-```text
-/hermes/api/dashboard/plugins/rescan
-```
-
-The rescan endpoint is protected by dashboard authentication and should be opened in an already logged-in browser session.
 
 ## Configuration
 
@@ -81,7 +45,7 @@ Example:
 plugins:
   fileviewer:
     enabled: true
-    root: /opt/merkur/reports
+    root: <your-document-root>
     title: Reports
     allowed_extensions:
       - .md
@@ -98,17 +62,12 @@ Recommended setup via the Hermes CLI:
 
 ```bash
 hermes config set plugins.fileviewer.enabled true
-hermes config set plugins.fileviewer.root /opt/merkur/reports
+hermes config set plugins.fileviewer.root <your-document-root>
 hermes config set plugins.fileviewer.title Reports
 hermes config set plugins.fileviewer.markdown_max_bytes 5242880
 hermes config set plugins.fileviewer.max_entries_per_directory 1000
 ```
-
-`allowed_extensions` must be a real YAML list, not one single string. Check the stored configuration if needed:
-
-```bash
-hermes config get plugins.fileviewer
-```
+ 
 
 Configuration fields:
 
@@ -123,6 +82,8 @@ Configuration fields:
 ## Functionality
 
 ### File browser
+
+<img src="media/screenshot.png">
 
 - Split view with directory list on the left and preview on the right.
 - Navigation through relative paths.
@@ -199,12 +160,13 @@ The plugin is intentionally restrictive:
 
 Status codes:
 
-- `503`: plugin disabled or invalid configuration
+- `400`: malformed path, for example a backslash or an absolute path
 - `403`: forbidden access, for example hidden path, symlink, or root escape
 - `404`: file or directory not found
 - `413`: Markdown file too large
-- `415`: unsupported file type
+- `415`: unsupported file type, or path is not a file/directory as expected
 - `422`: Markdown file is not valid UTF-8
+- `503`: plugin disabled or invalid configuration
 
 ## API endpoints
 
@@ -218,22 +180,19 @@ GET /raw?path=<relative-file>&mode=inline|download
 GET /raw-path/<relative-file>?mode=inline|download
 ```
 
-## Packaging and maintenance
+## Development
+### Maintenance
 
 ```bash
-make dist      # builds dist/fileviewer-0.1.0.tar.gz
-make install   # rsyncs fileviewer/ to PLUGIN_INSTALL_DIR from .env
-make clean     # removes dist/, .build, pytest cache, and __pycache__ directories
+make install   # rsyncs fileviewer/ to PLUGIN_INSTALL_DIR from .env (only for development)
+make clean     # removes pytest cache and __pycache__ directories
 ```
-
-The distribution archive contains the installable plugin directory plus `README.md`; it excludes tests, caches, `SPEC.md`, `Makefile`, and `.env`.
 
 ## Tests
 
 Run tests from the project directory:
 
 ```bash
-cd /opt/data/workspace/hermes-fileviewer-plugin
 uv run --with pytest --with fastapi --with httpx --with pyyaml python -m pytest tests/ -q
 node --check fileviewer/dashboard/dist/index.js
 ```
@@ -241,9 +200,13 @@ node --check fileviewer/dashboard/dist/index.js
 Current verified state:
 
 ```text
-25 passed
+27 passed
 ```
 
 ---
 
 Plugin developed in Hermes with GPT-5.5.
+
+## Licence
+
+MIT
