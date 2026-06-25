@@ -2,7 +2,7 @@
   "name": "fileviewer",
   "label": "Fileviewer",
   "description": "Read-only file viewer for a configured document root",
-  "icon": "FolderOpen",
+  "icon": "FileText",
   "version": "0.1.0",
   "tab": {
     "path": "/fileviewer",
